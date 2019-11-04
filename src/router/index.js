@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Login from "@/components/Login"
 import Home from "@/components/Home"
+import Main from "@/components/Main"
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import { homedir } from 'os';
@@ -25,6 +26,10 @@ export default new Router({
       path:"/login",
       name:"Login",
       component:Login
-    },
+    },{
+      path:"/main",
+      name:"Main",
+      component:Main,
+    }
   ]
 })
