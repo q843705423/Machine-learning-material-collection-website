@@ -87,11 +87,11 @@
     border-color: red;
   }
 
-  .magicBox{
+  .magicBox {
     /*border-radius: 50px;*/
     /*position:absolute;*/
-    margin:auto;
-    z-index:-1;
+    margin: auto;
+    z-index: -1;
     border-style: solid;
     border-width: 100px;
     border-bottom-color: #409EFF;
@@ -106,6 +106,7 @@
     /*-o-transform: rotate(45deg);*/
     /*transform: rotate(45deg);*/
   }
+
   .loginBox {
     width: 360px;
     padding: 10px 10px;
@@ -118,6 +119,9 @@
   }
 </style>
 <script>
+
+  import request from '@/utils/Axios'
+
   export default {
     name: 'Login',
     created() {
@@ -132,6 +136,20 @@
     },
     methods: {
       hello() {
+        request({
+          url: "user/login",
+          method: 'POST',
+          data: {
+            username: this.username,
+            password: this.password,
+          },
+
+        }).then(res => {
+          console.log(res)
+        }).catch(res => {
+          console.log("!!!")
+        })
+
         alert(this.username + " " + this.password)
       }
     }
