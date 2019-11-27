@@ -26,7 +26,9 @@
       </el-row>
 
       <el-row>
-        <el-button type='primary' @click='hello()' style="" class="buttonClass">登录</el-button>
+        <el-button type='primary' @click='login()' class="buttonClass"
+                   v-loading="loginButtonLoading">登录
+        </el-button>
       </el-row>
 
       <el-row style="">
@@ -121,6 +123,7 @@
 <script>
 
   import request from '@/utils/Axios'
+  import {Message, MessageBox} from 'element-ui'
 
   export default {
     name: 'Login',
@@ -129,13 +132,18 @@
     },
     data() {
       return {
+        loginButtonLoading: false,
         username: "",
         password: "",
 
       }
     },
     methods: {
-      hello() {
+      login() {
+        if (this.loginButtonLoading) {
+          return;
+        }
+        this.loginButtonLoading = true;
         request({
           url: "user/login",
           method: 'POST',
@@ -145,13 +153,19 @@
           },
 
         }).then(res => {
-          console.log(res)
+          this.loginButtonLoading = false;
+          res = res.data;
+          if (res.code === 0) {
+            Message({message: '登录成功', type: "success", duration: 1000,})
+            localStorage.setItem("ks", res.data.token);
+            this.$router.push({path: this.redirect || '/main'})
+          } else {
+            Message({message: res.msg, type: "error", duration: 1000,})
+          }
         }).catch(res => {
-          console.log("!!!")
+          this.loginButtonLoading = false;
         })
-
-        alert(this.username + " " + this.password)
-      }
+      },
     }
 
 

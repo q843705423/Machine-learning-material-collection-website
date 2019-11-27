@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { md5 } from '@/utils/md5'
+import {md5} from '@/utils/md5'
 import Cookies from 'js-cookie'
 // admin/login -> api/apicloud/admin/login
 // /admin/login -> api/apicloud/admin/login
@@ -19,14 +19,14 @@ export default request = (params) => {
   if (headers === undefined) {
     headers = {}
   }
-  headers['nonce'] = uuid()
-  headers['Authorization'] = headers['Authorization'] != null ? headers['Authorization'] : getToken()
-  headers['timestamp'] = getLocalTime()
-  headers['sign'] = calculateSign(headers['nonce'], headers['timestamp'], headers['Authorization'])
+  // headers['nonce'] = uuid()
+  headers['token'] = localStorage.getItem("ks");
+  // headers['timestamp'] = getLocalTime()
+  // headers['sign'] = calculateSign(headers['nonce'], headers['timestamp'], headers['Authorization'])
   // 'Authorization': 'Basic YXBpY2xvdWQ6ZXIjMWR3Rlc='
-  params['headers'] = headers
-  console.log(params)
-  axios.defaults.timeout =  60000
+  params['headers'] = headers;
+  // console.log(params)
+  axios.defaults.timeout = 60000;
   return axios(params)
 }
 

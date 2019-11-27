@@ -75,6 +75,7 @@
       <div class="content">
         <TaskShow></TaskShow>
       </div>
+<!--
       <el-table :data="tableData"
                 :header-cell-style="tableHeaderColor"
                 ref="multipleTable"
@@ -92,29 +93,10 @@
         <el-table-column prop="name" label="完成度" width="180" sortable align="center">
 
           <template slot-scope="scope">
-            <!--<el-tag :type="scope.row.tag === '学校' ? 'primary' : 'success'" disable-transitions>{{scope.row.tag}}-->
-            <!--</el-tag>-->
             {{ scope.row.now }} / {{ scope.row.total }}  {{scope.row | rateFilter}}%
           </template>
         </el-table-column>
         <el-table-column prop="date" label="日期" align="center"></el-table-column>
-        <!--
-                <el-table-column
-                  prop="tag"
-                  label="标签"
-                  width="100"
-                  :filters="[{ text: '学校', value: '学校' }, { text: '公司', value: '公司' }]"
-                  :filter-method="filterTag"
-                  filter-placement="bottom-end"
-                  align="center">
-                  <template slot-scope="scope">
-                    <el-tag
-                      :type="scope.row.tag === '学校' ? 'primary' : 'success'"
-                      disable-transitions>{{scope.row.tag}}
-                    </el-tag>
-                  </template>
-                </el-table-column>
-        -->
         <el-table-column label="操作" fixed="right" align="center">
           <template slot-scope="scope">
             <el-button
@@ -130,7 +112,8 @@
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
+      </EL-TABLE>
+-->
 
     </div>
 
