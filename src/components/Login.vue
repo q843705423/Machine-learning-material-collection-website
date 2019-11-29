@@ -26,22 +26,18 @@
       </el-row>
 
       <el-row>
+
         <el-button type='primary' @click='login()' class="buttonClass"
-                   v-loading="loginButtonLoading">登录
+                   v-loading="loginButtonLoading">
+          登录
         </el-button>
       </el-row>
-
-      <el-row style="">
-
-        <!--
-                <el-row style='margin-top:20px'>
-                  <span>求救,我<router-link to='Forget' style='color:blue'>忘记了密码</router-link></span>
-                </el-row>
-                <el-row style='margin-top:20px'>
-                  <span>我想要<router-link to='Login' style='color:blue'>注册账号</router-link></span>
-                </el-row>
-        -->
-        <!-- <el-button  type='warning' @click='hello()' style="width:300px" class="button" >注册</el-button> -->
+      <el-row>
+        <el-col :xs="12" :sm="12" :lg="12" class="card-panel-col">
+          <el-link href="/">
+              <i class="el-icon-back"></i>返回
+          </el-link>
+        </el-col>
       </el-row>
 
     </div>
@@ -158,7 +154,7 @@
           if (res.code === 0) {
             Message({message: '登录成功', type: "success", duration: 1000,})
             localStorage.setItem("ks", res.data.token);
-            this.$router.push({path: this.redirect || '/main'})
+            this.$router.push({path: this.redirect || '/task'})
           } else {
             Message({message: res.msg, type: "error", duration: 1000,})
           }

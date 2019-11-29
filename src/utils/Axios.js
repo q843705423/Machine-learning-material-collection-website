@@ -25,7 +25,6 @@ export default request = (params) => {
   // headers['sign'] = calculateSign(headers['nonce'], headers['timestamp'], headers['Authorization'])
   // 'Authorization': 'Basic YXBpY2xvdWQ6ZXIjMWR3Rlc='
   params['headers'] = headers;
-  // console.log(params)
   axios.defaults.timeout = 60000;
   return axios(params)
 }

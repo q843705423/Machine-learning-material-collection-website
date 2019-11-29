@@ -3,28 +3,29 @@
     <div class='header'>
 
       <div class='title' style='font-size:40px;float:left;margin:20px 0 0 20%;'>机器学习素材收集网</div>
-<!--
-      <div class="menu" style='margin:0 0 0 100px;'>
-        <ul>
-          <li>
-            <router-link to="/home">首页</router-link>
-          </li>
-          <li>
-            <router-link to="/home">查看需求</router-link>
-          </li>
-        </ul>
-      </div>
--->
+      <!--
+            <div class="menu" style='margin:0 0 0 100px;'>
+              <ul>
+                <li>
+                  <router-link to="/home">首页</router-link>
+                </li>
+                <li>
+                  <router-link to="/home">查看需求</router-link>
+                </li>
+              </ul>
+            </div>
+      -->
       <div class="login">
         <!--<el-button style='background:rgba(255,255,255,0);color:#eee;margin:25px 0 0 100;'>登录</el-button>-->
-        <el-button style='background:rgba(255,255,255,0);color:#eee;margin:25px 0 0 100px;'>登录</el-button>
+        <el-button @click="goLoginInterface" style='background:rgba(255,255,255,0);color:#eee;margin:25px 0 0 100px;'>
+          登录
+        </el-button>
         <!-- <router-link to="/login">登录</router-link> -->
       </div>
     </div>
   </div>
 
 </template>
-
 <style scoped>
   .menu {
 
@@ -72,6 +73,11 @@
 <script>
   export default {
     name: 'Menu',
+    methods: {
+      goLoginInterface(){
+        this.$router.push({path: "/login"})
+      }
+    }
 
   }
 </script>

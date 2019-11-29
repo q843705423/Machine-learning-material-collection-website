@@ -10,8 +10,8 @@
           用最简单的方式，让全世界为你提供数据服务
         </div>
         <div style='margin:70px auto 0 auto;width:600px;'>
-          <el-input placeholder="手机" style="width:220px;"></el-input>
-          <el-input placeholder="密码" style="width:220px;"></el-input>
+          <el-input v-model="phone" placeholder="手机" style="width:220px;"></el-input>
+          <el-input v-model="password" placeholder="密码" type="password" style="width:220px;"></el-input>
           <el-button style='width:150px'>创建账号</el-button>
         </div>
         <div class="computer">
@@ -189,7 +189,17 @@
 
 <script>
   export default {
-    name: 'Home'
+    name: 'Home',
+    data:function(){
+      return {
+        phone:"",
+        password:"",
+
+      }
+    },
+    methods:{
+
+    }
   }
 </script>
 
