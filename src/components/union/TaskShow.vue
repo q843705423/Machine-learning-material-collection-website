@@ -2,124 +2,16 @@
   <div>
     <h1 style="margin:20px 0 0 20px">任务</h1>
     <div style="padding:10px 0 0 10px">
-      <el-dialog :visible="showDialog">
-        <el-row>
-          <el-col>
-            <div style="text-align:center">
-            <span style="font-size:16px">
-              {{dialog.title}}
-            </span>
-            </div>
-          </el-col>
-        </el-row>
-        <el-row style="margin: 20px 0 0 0 ">
-          <el-col>
-              <el-input type="textarea" readonly v-model="dialog.content" ></el-input>
-          </el-col>
-        </el-row>
-        <el-row style="font-size:20px;margin: 20px 0 0 20px">
-          <el-col :xs="12" :sm="12" :lg="12" class="card-panel-col">
-            <i class="el-icon-postcard">
-              <span style="color:#409EFF"> {{dialog.lowerCreditLimit}} </span>
-            </i>
-          </el-col>
-          <el-col :xs="12" :sm="12" :lg="12" class="card-panel-col">
-            <i class="el-icon-coin">
-              <span style="color:#E6A23C">{{dialog.eachTaskScore}}</span>
-            </i>
-          </el-col>
-        </el-row>
-        <el-row style="font-size:20px;margin: 20px 0 0 20px">
-          <el-col :xs="12" :sm="12" :lg="12" class="card-panel-col">
-            <i class="el-icon-picture">
-              {{dialog.pictureNumber}}
-            </i>
-          </el-col>
-          <el-col :xs="12" :sm="12" :lg="12" class="card-panel-col">
-            <i class="el-icon-timer">
-              {{dialog.endTime}}
-            </i>
-          </el-col>
-        </el-row>
-        <el-row style="font-size:20px;margin: 20px 0 0 20px">
-          <el-col style="text-align:center">
-            <el-button @click="accept(dialog.id)" type="primary">
-              接受任务
-            </el-button>
-            <el-button @click="closeDialog" type="info">
-              关闭窗口
-            </el-button>
-          </el-col>
-        </el-row>
-      </el-dialog>
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="任务列表" name="first">
-          <div style="margin: 0 0 20px 0">
-
-            <el-input v-model="keyword" placeholder="请输入要搜索的关键词" style="width:400px"></el-input>
-            <el-button type="primary" @click="selectData">搜索</el-button>
-          </div>
-
-          <el-row v-if="list.size == 0">
-            抱歉，没有找到任何有关的数据
-          </el-row>
-          <el-row v-else v-loading="cardLoading" style="min-height: 570px">
-            <el-col :xs="8" :sm="8" :lg="8" class="card-panel-col" v-for="item in list">
-              <el-card>
-                <el-row>
-                  <el-col :xs="18" :sm="18" :lg="18" class="card-panel-col">
-                    <i class="el-icon-s-opportunity">
-                      {{item.title}}
-                    </i>
-                  </el-col>
-                  <el-col :xs="6" :sm="6" :lg="6" class="card-panel-col">
-                    <el-button type="primary" @click="viewDetails(item)">
-                      查看详情
-                    </el-button>
-                  </el-col>
-
-                </el-row>
-                <el-row>
-                  <el-col :xs="8" :sm="8" :lg="8" class="card-panel-col">
-                    <i class="el-icon-s-custom">
-                      <span>{{item.nickName}}</span>
-                    </i>
-                  </el-col>
-                  <el-col :xs="8" :sm="8" :lg="8" class="card-panel-col">
-                    <i class="el-icon-postcard">
-                      <span style="color:#409EFF"> {{item.lowerCreditLimit}} </span>
-                    </i>
-                  </el-col>
-                  <el-col :xs="8" :sm="8" :lg="8" class="card-panel-col">
-                    <i class="el-icon-coin">
-                      <span style="color:#E6A23C">{{item.eachTaskScore}}</span>
-                    </i>
-                  </el-col>
-
-                </el-row>
-                <el-row>
-                  <el-col :xs="16" :sm="16" :lg="16" class="card-panel-col" style="margin: 10px 0 0 0">
-                    <el-progress :text-inside="true" :stroke-width="16"
-                                 :percentage="item.taskAcceptNumber * 100 /item.taskNumber"></el-progress>
-                  </el-col>
-                  <el-col :xs="8" :sm="8" :lg="8" class="card-panel-col" style="margin: 10px 0 0 0">
-                    <i class="el-icon-pie-chart">
-                      <span style="font-size:8px">{{item.hint}}</span>
-                    </i>
-                  </el-col>
-
-                </el-row>
-              </el-card>
-            </el-col>
-          </el-row>
-          <pagination v-show="listQuery.total>0" :total="listQuery.total" :page.sync="listQuery.current"
-                      :limit.sync="listQuery.limit" @pagination="selectData"/>
+          <TaskList></TaskList>
         </el-tab-pane>
         <el-tab-pane label="待完成任务" name="second">
           待完成任务
         </el-tab-pane>
         <el-tab-pane label="已接受任务" name="third">
-          已接受任务
+          <AcceptList></AcceptList>
+
         </el-tab-pane>
         <el-tab-pane label="发布任务" name="four">
           <div>
@@ -178,46 +70,19 @@
 
 </style>
 <script>
-  import {Message} from 'element-ui'
+  import {Message, MessageBox} from 'element-ui'
   import request from '@/utils/Axios'
   import Pagination from '@/views/Pagination'
+  import TaskList from '@/components/union/taskShow/TaskList'
+  import AcceptList from '@/components/union/taskShow/AcceptList'
 
   export default {
     name: "TaskShow",
-    components: {Pagination},
+    components: {Pagination,TaskList,AcceptList},
     created: function () {
-      this.selectData();
     },
     data: function () {
       return {
-        dialog: {
-          id: 1,
-          title: "猫的图片",
-          content: "收收收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片集10张猫的图片收收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片集10张猫的图片收收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片集10张猫的图片收收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片集10张猫的图片收收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片集10张猫的图片收收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片集10张猫的图片收收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片收集10张猫的图片集10张猫的图片",
-          nickname: "其乐无穷",
-          eachTaskScore: 0,
-          pictureNumber: 0,
-          lowerCreditLimit: 0,
-          taskNumber: 0,
-
-        },
-/*
-        searchHandle:[
-          {label:"确定",type:"primary",handle:()=>{this.alert1()}},
-          {label:"取消",type:"info",handle:()=>{this.alert2()}}
-
-        ],
-*/
-        showDialog: false,
-        cardLoading: false,
-        keyword: "",
-        list: [],
-        listQuery: {
-          current: 1,
-          limit: 10,
-          total: 0,
-          loading: false
-        },
         myRule: {
           title: [{required: true, message: '请输入任务名', trigger: 'blur'}],
           content: [{required: true, message: '详细内容不能为空', trigger: 'blur'}],
@@ -242,41 +107,29 @@
 
         }
       }
-    }, methods: {
-      accept(row) {
-      },
-      closeDialog() {
-        this.showDialog = false;
-      },
-      viewDetails(item) {
-        this.dialog.id = item.id;
-        this.dialog.title = item.title;
-        this.dialog.content = item.content;
-        this.dialog.nickname = item.nickname;
-        this.dialog.eachTaskScore = item.eachTaskScore;
-        this.dialog.pictureNumber = item.pictureNumber;
-        this.dialog.lowerCreditLimit = item.lowerCreditLimit;
-        this.dialog.taskNumber = item.taskNumber;
-        this.showDialog = true;
+    },
+    methods: {
+      clearForm() {
+        for (let key in this.form) {
+          this.form[key] = ''
+        }
       },
       handleClick() {
 
       },
       beginTimeChange() {
+      },
+      endTimeChange() {
 
-      }, endTimeChange() {
-
-      }, clearForm() {
-        for (let key in this.form) {
-          this.form[key] = ''
-        }
-      }, insert() {
+      },
+      insert() {
         this.$refs['form'].validate((valid) => {
           if (valid) {
             this.insertData();
           }
         })
-      }, insertData() {
+      },
+      insertData() {
         request({
           url: "task/insert",
           method: "POST",
@@ -295,34 +148,6 @@
           }
 
         })
-      }, selectData() {
-        this.cardLoading = true;
-        request({
-          url: "task/list",
-          method: "POST",
-          data: {
-            current: this.listQuery.current,
-            size: this.listQuery.limit,
-            keyword: this.keyword,
-          }
-        }).then(res => {
-          this.cardLoading = false;
-          res = res.data;
-          if (res.code === 0) {
-            this.listQuery.total = res.data.total;
-            this.list = res.data.records;
-          } else {
-            Message({
-              message: res.msg,
-              type: "error",
-              duration: 2000,
-            })
-          }
-        }).catch(res => {
-          this.cardLoading = false
-
-        })
-
       },
     },
     filters: {}

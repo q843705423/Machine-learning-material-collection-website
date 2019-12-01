@@ -1,5 +1,26 @@
 <template>
   <div>
+    <el-dialog :visible.sync="updateDialog.show">
+      <el-row>
+
+        <el-form ref="updateDialog" label-position="left" label-width="120px">
+          <el-form-item label="反驳理由">
+            <el-row>
+              <el-col :xs="18" :sm="18" :md="18" :lg="18">
+                <el-input v-model="updateDialog.rejectCause"/>
+              </el-col>
+              <el-col :xs="6" :sm="6" :md="6" :lg="6" style="padding:0 0 0 10px">
+                <el-button type="warning" @click="reject">
+                  确定
+                </el-button>
+              </el-col>
+            </el-row>
+          </el-form-item>
+        </el-form>
+      </el-row>
+      <el-row>
+      </el-row>
+    </el-dialog>
     <el-dialog :visible.sync="dialog.show">
       <el-row>
         <el-row>
@@ -127,6 +148,12 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="audit(scope.row)">审核</el-button>
+          <el-button size="mini" type="success" @click="agreeConfirm(scope.row)">
+            同意
+          </el-button>
+          <el-button size="mini" type="danger" @click="rejectConfirm(scope.row)">
+            拒绝
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -151,6 +178,11 @@
     components: {Pagination},
     data: function () {
       return {
+        updateDialog:{
+          show:false,
+          rejectCause:'',
+          taskId:'',
+        },
         form: {
           id: "",
           title: "",
@@ -184,24 +216,76 @@
 
       };
     }, methods: {
-      agreeConfirm(){
+      agreeConfirm(row) {
+        if(row){
+          this.form.id = row.id;
+        }
+
         MessageBox.confirm(
-          '是否?',
-          '确定',
+          '是否同意该任务?',
+          '确定同意该任务',
           {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }
-        ).then((res) => {
+        ).then(() => {
+          this.agree(this.form.id)
         })
 
-      },agree(){
+      }, agree(taskId) {
+        request({
+          url: "task/agree",
+          method: "POST",
+          data: {
+            taskId: taskId,
+          }
+        }).then(res => {
+          this.dialog.show = false;
+          console.log("task/agree:---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            Message({message: "任务审核成功", type: "success", duration: 2000,})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("task/agree:|||||||||||||||||||||||||||||||||||||||||||");
+          this.selectData()
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
 
       },
-      rejectConfirm(){
+      rejectConfirm(row) {
+        if(row){
+          this.form.id = row.id;
+        }
+        this.updateDialog.show = true;
+      }, reject() {
+        request({
+          url: "task/reject",
+          method: "POST",
+          data: {
+            taskId:this.form.id,
+            rejectCause:this.updateDialog.rejectCause
+          }
+        }).then(res => {
+          this.updateDialog.show = false
+          res = res.data;
+          if (res.code === 0) {
+            Message({message: "审核驳回成功", type: "success", duration: 2000,})
 
-      },reject(){
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("task/reject:|||||||||||||||||||||||||||||||||||||||||||");
+          this.selectData()
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
 
       },
       audit(row) {
@@ -218,7 +302,6 @@
         }
       },
       selectData() {
-        console.log("selectData")
         request({
           url: "task/unAuditList",
           method: "POST",
@@ -228,9 +311,7 @@
 
           }
         }).then(res => {
-          console.log("selectData");
           res = res.data;
-          console.log(res);
           if (res.code === 0) {
             this.list = res.data.records;
             this.listQuery.total = res.data.total

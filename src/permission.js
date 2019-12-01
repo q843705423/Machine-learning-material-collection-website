@@ -3,7 +3,6 @@ import router from './router'
 
 const _import = require('./router/_import_development.js')//获取组件的方法
 import request from '@/utils/Axios'
-import Cookies from 'js-cookie'
 import axios from 'axios'
 import {Message} from 'element-ui'
 import Main from "@/components/Main"

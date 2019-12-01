@@ -1,6 +1,5 @@
 import axios from 'axios'
 import {md5} from '@/utils/md5'
-import Cookies from 'js-cookie'
 // admin/login -> api/apicloud/admin/login
 // /admin/login -> api/apicloud/admin/login
 var request;

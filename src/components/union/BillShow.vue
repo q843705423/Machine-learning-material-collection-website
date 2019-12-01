@@ -5,7 +5,7 @@
         hello
       </el-col>
       <el-col :xs="12" :sm="12" :md="12" :lg="12">
-        world
+
       </el-col>
     </el-row>
   </div>
@@ -16,7 +16,6 @@
 <script>
   import axios from "axios";
   import {Message, MessageBox} from 'element-ui'
-  import Cookies from 'js-cookie'
 
   export default {
     name:"BillShow",
