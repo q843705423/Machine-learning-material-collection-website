@@ -4,17 +4,23 @@
     <div style="padding:10px 0 0 10px">
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="任务列表" name="first">
-          <TaskList></TaskList>
+          <div v-if="activeName === 'first'">
+            <TaskList></TaskList>
+          </div>
         </el-tab-pane>
-        <el-tab-pane label="待完成任务" name="second">
-          待完成任务
+        <el-tab-pane label="待完成任务" name="second"  >
+          <div v-if="activeName === 'second'">
+            待完成任务
+          </div>
         </el-tab-pane>
-        <el-tab-pane label="已接受任务" name="third">
-          <AcceptList></AcceptList>
+        <el-tab-pane label="已接受任务" name="third" >
+          <div v-if="activeName === 'third'">
+            <AcceptList></AcceptList>
+          </div>
 
         </el-tab-pane>
-        <el-tab-pane label="发布任务" name="four">
-          <div>
+        <el-tab-pane label="发布任务" name="four" >
+          <div v-if="activeName === 'four'">
             <el-form ref="form" label-position="left" label-width="100px" style="width: 600px; margin-left:20px;"
                      :rules="myRule" :model="form">
 

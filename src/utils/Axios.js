@@ -13,10 +13,10 @@ export default request = (params) => {
   } else {
     url = 'api/' + url
   }
-  params['url'] = url
-  let headers = params['headers']
+  params['url'] = url;
+  let headers = params['headers'];
   if (headers === undefined) {
-    headers = {}
+    headers = {};
   }
   // headers['nonce'] = uuid()
   headers['token'] = localStorage.getItem("ks");

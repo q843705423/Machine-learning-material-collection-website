@@ -1,9 +1,105 @@
 <template>
   <div>
+    <el-dialog title="图片上传" :visible.sync="continueFinishDialog.show">
+      <el-row>
+        <el-col :xs="24" :sm="24" :lg="24" class="card-panel-col">
+          <el-upload
+            :action="uploadActionUrl"
+            ref="upload"
+            multiple
+            :limit="3"
+            :on-exceed="handleExceed"
+            :http-request="uploadImg"
+            :auto-upload="false">
+            <el-button size="small" type="primary">选择图片</el-button>
+          </el-upload>
+          <el-button size="small" style="margin-left: 10px;"  type="success" @click="submitUpload">
+            上传到服务器
+          </el-button>
+
+        </el-col>
+      </el-row>
+    </el-dialog>
+    <el-dialog title="查询详情" :visible.sync="viewDetailDialog.show">
+      <el-form ref="dataForm" label-position="left" label-width="150px" style="width: 400px;margin-left:10px ">
+
+        <el-form-item label="id">
+          <el-input v-model="viewDetailForm.id" readonly/>
+        </el-form-item>
+
+        <el-form-item label="用户名">
+          <el-input v-model="viewDetailForm.nickname" readonly/>
+        </el-form-item>
+
+        <el-form-item label="资源ID">
+          <el-input v-model="viewDetailForm.resourceId" readonly/>
+        </el-form-item>
+
+        <el-form-item label="接受时间">
+          <el-input v-model="viewDetailForm.acceptTime" readonly/>
+        </el-form-item>
+
+        <el-form-item label="用户ID">
+          <el-input v-model="viewDetailForm.userId" readonly/>
+        </el-form-item>
+
+        <el-form-item label="任务ID">
+          <el-input v-model="viewDetailForm.taskId" readonly/>
+        </el-form-item>
+
+        <el-form-item label="完成数量">
+          <el-input v-model="viewDetailForm.finishNumber" readonly/>
+        </el-form-item>
+
+        <el-form-item label="子任务状态">
+          <el-input v-model="viewDetailForm.subStatus" readonly/>
+        </el-form-item>
+
+        <el-form-item label="开始时间">
+          <el-input v-model="viewDetailForm.beginTime" readonly/>
+        </el-form-item>
+
+        <el-form-item label="结束时间">
+          <el-input v-model="viewDetailForm.endTime" readonly/>
+        </el-form-item>
+
+        <el-form-item label="标题">
+          <el-input v-model="viewDetailForm.title" readonly/>
+        </el-form-item>
+
+        <el-form-item label="内容">
+          <el-input v-model="viewDetailForm.content" readonly/>
+        </el-form-item>
+
+        <el-form-item label="任务类型">
+          <el-input v-model="viewDetailForm.type" readonly/>
+        </el-form-item>
+
+        <el-form-item label="创建时间">
+          <el-input v-model="viewDetailForm.createTime" readonly/>
+        </el-form-item>
+
+        <el-form-item label="图片数量">
+          <el-input v-model="viewDetailForm.pictureNumber" readonly/>
+        </el-form-item>
+
+        <el-form-item label="任务奖励">
+          <el-input v-model="viewDetailForm.eachTaskScore" readonly/>
+        </el-form-item>
+
+        <el-form-item label="任务数量">
+          <el-input v-model="viewDetailForm.taskNumber" readonly/>
+        </el-form-item>
+        <el-form-item label="">
+          <el-button type="info" @click="viewDetailDialog.show =false">关闭</el-button>
+
+        </el-form-item>
+      </el-form>
+    </el-dialog>
     <el-table
       style="margin: 20px 1%;width:98%;"
-      v-loading="acceptQuery.condition.loading"
-      :data="acceptQuery.condition.records"
+      v-loading="listQuery.condition.loading"
+      :data="listQuery.records"
       :header-row-style="{background:'#000',color:'#000'}"
       element-loading-text="正在加载"
       border="" fit="">
@@ -15,19 +111,80 @@
           {{ scope.row.title }}
         </template>
       </el-table-column>
+
+
+      <el-table-column align="center" label="接受任务时间">
+        <template slot-scope="scope">
+          {{ scope.row.acceptTime}}
+        </template>
+      </el-table-column>
+
+
+      <el-table-column align="center" label="完成量">
+        <template slot-scope="scope">
+          {{ scope.row.finishNumber}} / {{ scope.row.pictureNumber}}
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="状态">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.subStatus | subStatusToTagTypeFilter">
+
+            {{ scope.row.subStatus | subStatusFilter}}
+          </el-tag>
+        </template>
+      </el-table-column>
+
+
+      <el-table-column align="center" label="结束时间">
+        <template slot-scope="scope">
+          {{ scope.row.endTime}}
+        </template>
+      </el-table-column>
+
+
+      <el-table-column align="center" label="类型">
+        <template slot-scope="scope">
+          {{ scope.row.type | taskTypeFilter}}
+        </template>
+      </el-table-column>
+
+
+      <el-table-column align="center" label="任务积分">
+        <template slot-scope="scope">
+          {{ scope.row.eachTaskScore}}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" width="400px">
+        <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="viewDetail(scope.row)">详情</el-button>
+          <el-button size="mini" type="warning" @click="continueFinish(scope.row)">继续完成</el-button>
+          <el-button size="mini" type="success" @click="finishTaskConfirm(scope.row)">完成任务</el-button>
+          <el-button size="mini" type="danger" @click="abandonMission(scope.row)">放弃任务</el-button>
+
+        </template>
+      </el-table-column>
+
+
     </el-table>
-              <pagination :v-if="ok" v-show="acceptQuery.condition.total>0" :total="condition.total" :page.sync="acceptQuery.condition.current"
-                          :limit.sync="acceptQuery.condition.limit" @pagination="selectAcceptList"/>
+    <div v-if="ok">
+      <pagination :v-if="ok" v-show="listQuery.condition.total>0" :total="listQuery.condition.total"
+                  :page.sync="listQuery.condition.current"
+                  :limit.sync="listQuery.condition.limit" @pagination="selectAcceptList"/>
+    </div>
   </div>
 </template>
 <style>
 
 </style>
 <script>
+  import axios from 'axios'
+  import {Message, MessageBox} from 'element-ui'
   import request from '@/utils/Axios'
   import Pagination from '@/views/Pagination'
+
   export default {
-    name:"AcceptList",
+    name: "AcceptList",
     components: {Pagination},
     created: function () {
       this.selectAcceptList()
@@ -36,36 +193,105 @@
     },
     data: function () {
       return {
-        ok : false,
-        acceptQuery:{
-          condition:{
+        continueFinishDialog: {
+          show: false
+        },
+
+        uploadActionUrl: 'api/resource/upload',
+        ok: false,
+        viewDetailDialog: {
+          show: false,
+        },
+        viewDetailForm: {
+          id: '',
+          nickname: '',
+          resourceId: '',
+          acceptTime: '',
+          userId: '',
+          taskId: '',
+          finishNumber: '',
+          subStatus: '',
+          beginTime: '',
+          endTime: '',
+          title: '',
+          content: '',
+          type: '',
+          createTime: '',
+          pictureNumber: '',
+          eachTaskScore: '',
+          taskNumber: '',
+        },
+        listQuery: {
+          condition: {
             current: 1,
             limit: 10,
             total: 0,
             loading: false
-          },records:[
-
-          ],
+          }, records: [],
 
         },
       };
     }, methods: {
-      selectAcceptList(){
-        if(!this.ok){
-          return ;
-        }
+      submitUpload() {
+        this.$refs.upload.submit();
+      },
+      handleExceed() {
+
+      },
+      uploadImg(val) {
+        // alert("hello world");
+        //RenameFileWithSuffixReserved
+        let fd = new FormData();
+        fd.append('taskId', this.viewDetailForm.taskId);
+        fd.append('file', val.file);
+        axios.post('api/resource/upload', fd, {
+          headers: {
+            'ks': '1'
+          }
+        }).then(res => {
+          this.continueFinishDialog.show = false;
+          res = res.data;
+          if(res.code === 0){
+            Message({message: "上传图片成功", type:"success", duration: 2000})
+          }else{
+            Message({message: res.msg, type: "error", duration: 2000});
+          }
+        })
+      },
+      handleExceed() {
+        console.log("handleExceed");
+
+      },
+      abandonMission(row) {
+
+      },
+      finishTaskConfirm(row) {
+
+      },
+      continueFinish(row) {
+        this.continueFinishDialog.show = true
+
+      },
+      viewDetail(row) {
+        this.viewDetailDialog.show = true;
+        this.viewDetailForm = row;
+      },
+      selectAcceptList() {
         console.log("task/acceptList:---------------------");
         request({
           url: "subTask/acceptList",
           method: "POST",
-          data: {}
+          data: {
+            current: this.listQuery.condition.current,
+            size: this.listQuery.condition.limit,
+          }
         }).then(res => {
           console.log("task/acceptList:---------------------");
           res = res.data;
           console.log(res);
           if (res.code === 0) {
-            this.acceptQuery.records = res.data.records;
-            this.acceptQuery.condition.total = res.data.total;
+            this.listQuery.records = res.data.records;
+            this.listQuery.condition.total = res.data.total;
           } else {
             Message({message: res.msg, type: "error", duration: 2000,})
           }
@@ -81,6 +307,22 @@
     }, watch: {
       "test": function () {
 
+      },
+    }, filters: {
+      subStatusFilter(subStatus) {
+        console.log("subStatus");
+        console.log(subStatus);
+        return subStatus === 0 ? '待完成' : '完成';
+      },
+      statusFilter(status) {
+
+      },
+      typeFilter(type) {
+
+      }, subStatusToTagTypeFilter(subStatus) {
+        return subStatus === 0 ? 'info' : 'success';
+      }, taskTypeFilter(type) {
+        return type === 0 ? "收集任务" : "分类任务"
       }
     }
   }
