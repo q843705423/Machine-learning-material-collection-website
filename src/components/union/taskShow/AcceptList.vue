@@ -122,7 +122,7 @@
 
       <el-table-column align="center" label="完成量">
         <template slot-scope="scope">
-          {{ scope.row.finishNumber}} / {{ scope.row.pictureNumber}}
+          {{ scope.row.finishNumber}} / {{ scope.row.pictureNumberEachTask}}
         </template>
       </el-table-column>
 
@@ -242,11 +242,11 @@
         // alert("hello world");
         //RenameFileWithSuffixReserved
         let fd = new FormData();
-        fd.append('taskId', this.viewDetailForm.taskId);
+        fd.append('subTaskId', this.viewDetailForm.id);
         fd.append('file', val.file);
         axios.post('api/resource/upload', fd, {
           headers: {
-            'ks': '1'
+            'token': localStorage.getItem("ks")
           }
         }).then(res => {
           this.continueFinishDialog.show = false;
@@ -256,6 +256,7 @@
           }else{
             Message({message: res.msg, type: "error", duration: 2000});
           }
+          this.selectAcceptList();
         })
       },
       handleExceed() {
@@ -266,10 +267,45 @@
 
       },
       finishTaskConfirm(row) {
+        MessageBox.confirm(
+          '是否完成该任务?',
+          '确定完成该任务',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        ).then((res) => {
+          this.finishsubTask(row.id)
+        })
+
+      },finishsubTask(subTaskId){
+        request({
+          url: "subTask/userFinishTask",
+          method: "POST",
+          data: {
+            subTaskId:subTaskId
+          }
+        }).then(res => {
+          console.log(":---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            Message({message: "任务完成成功", type: "success", duration: 2000,})
+
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log(":|||||||||||||||||||||||||||||||||||||||||||");
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
 
       },
       continueFinish(row) {
-        this.continueFinishDialog.show = true
+        this.continueFinishDialog.show = true;
+        this.viewDetailForm = row
 
       },
       viewDetail(row) {
