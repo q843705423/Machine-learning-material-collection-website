@@ -10,7 +10,7 @@
         </el-tab-pane>
         <el-tab-pane label="待完成任务" name="second"  >
           <div v-if="activeName === 'second'">
-            待完成任务
+            <UnFinishTaskList></UnFinishTaskList>
           </div>
         </el-tab-pane>
         <el-tab-pane label="已接受任务" name="third" >
@@ -81,10 +81,11 @@
   import Pagination from '@/views/Pagination'
   import TaskList from '@/components/union/taskShow/TaskList'
   import AcceptList from '@/components/union/taskShow/AcceptList'
+  import UnFinishTaskList from '@/components/union/taskShow/UnFinishTaskList'
 
   export default {
     name: "TaskShow",
-    components: {Pagination,TaskList,AcceptList},
+    components: {Pagination,TaskList,AcceptList,UnFinishTaskList},
     created: function () {
     },
     data: function () {
