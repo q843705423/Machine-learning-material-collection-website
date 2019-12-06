@@ -3,6 +3,7 @@
     <el-dialog title="查询详情" :visible.sync="dialog.show">
       <el-form ref="dataForm" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
 
+
         <el-form-item label="id">
           <el-input v-model="form.id" readonly/>
         </el-form-item>
@@ -115,13 +116,15 @@
 
       <el-table-column align="center" label="类型">
         <template slot-scope="scope">
-          {{ scope.row.type}}
+          {{ scope.row.type | typeFilter}}
         </template>
       </el-table-column>
 
       <el-table-column align="center" label="状态">
         <template slot-scope="scope">
-          {{ scope.row.status}}
+          <el-tag :type="scope.row.status | statusShowFilter">
+            {{ scope.row.status | statusFilter}}
+          </el-tag>
         </template>
       </el-table-column>
 
@@ -164,7 +167,7 @@
           <el-button type="primary" @click="detail(scope.row)">
             详情
           </el-button>
-          <el-button type="primary" @click="hello">
+          <el-button type="success" @click="finishTaskConfirm(scope.row.id)" v-if="scope.row.status !== 1">
             完成
           </el-button>
 
@@ -190,8 +193,8 @@
     },
     data: function () {
       return {
-        dialog:{
-          show:false,
+        dialog: {
+          show: false,
         },
         list: [],
 
@@ -221,12 +224,44 @@
 
       };
     }, methods: {
-      detail(row) {
-        this.dialog.show =true
-        this.form = row
-
+      finishTaskConfirm (taskId){
+        MessageBox.confirm(
+          '是否完成此任务?',
+          '确定完成此任务',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        ).then((res) => {
+          this.finishTask(taskId)
+        })
       },
-      hello() {
+      finishTask(taskId) {
+
+        request({
+          url: "task/finishPublishTask",
+          method: "POST",
+          data: {
+            taskId:taskId
+          }
+        }).then(res => {
+          console.log("task/finishPublishTask:---------------------");
+          res = res.data;
+          if (res.code === 0) {
+            Message({message: "完成该发布任务", type: "success", duration: 2000,})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("task/finishPublishTask:|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
+      },
+      detail(row) {
+        this.dialog.show = true;
+        this.form = row;
 
       },
       selectData() {
@@ -257,6 +292,33 @@
       "test": function () {
 
       }
+    },filters:{
+      statusFilter(status){
+        let statusMap = {
+          0:"待审核",
+          1:"正在进行",
+          2:"已经完成",
+          3:"审核拒绝",
+          4:"已放弃",
+        };
+        return statusMap[status]
+      },typeFilter(type){
+        let typeMap ={
+          0:"普通收集任务"
+        }
+        return typeMap[type]
+
+      },statusShowFilter(status){
+        let statusShowMap = {
+          0:"info",
+          1:"warning",
+          2:"success",
+          3:"danger",
+          4:"danger",
+        };
+        return statusShowMap[status]
+      }
     }
+
   }
 </script>
