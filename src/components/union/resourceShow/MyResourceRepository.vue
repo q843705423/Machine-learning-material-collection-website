@@ -7,7 +7,7 @@
         <el-col :xs="18" :sm="18" :lg="18" class="card-panel-col">
           <i class="el-icon-picture-outline" style="font-size:20px">
           <span style="color:blue;cursor:pointer;font-size:20px;" @click="showDialog(item)">
-          {{ item.name }}
+          {{ item.resourceName }}
           </span>
           </i>
         </el-col>
@@ -20,7 +20,7 @@
       </el-row>
       <el-row>
         <el-col :xs="24" :sm="24" :lg="24" class="card-panel-col" style="margin: 10px 0 0 0 ">
-          {{item.desc}}
+          {{item.describeContent}}
         </el-col>
       </el-row>
       <el-row style="margin:20px 0 0 0 ">
@@ -45,8 +45,8 @@
 
         </el-col>
         <el-col :xs="6" :sm="6" :lg="6" class="card-panel-col" style="text-align: right">
-          <i class="el-icon-info" @click="openAndReadOnlyConfirm">开源只读</i>
-          <i class="el-icon-info" @click="openAndCanChangeConfirm">开源可改</i>
+          <i class="el-icon-info" @click="openAndReadOnlyConfirm" style="margin: 0 0 0 20px;cursor:pointer">开源只读</i>
+          <i class="el-icon-info" @click="openAndCanChangeConfirm" style="margin: 0 20px 0 20px;cursor:pointer">开源可改</i>
           <!--          <el-button type="success" @click="openConfirm">开源且可修改</el-button>-->
         </el-col>
 
@@ -95,8 +95,8 @@
   }
 </style>
 <script>
-  import axios from "axios";
   import {Message, MessageBox} from 'element-ui'
+  import request from '@/utils/Axios'
   import Cookies from 'js-cookie'
 
   export default {
@@ -104,10 +104,18 @@
     components: {Message, MessageBox},
 
     created: function () {
+      this.getMyResourceList()
 
     },
     data: function () {
       return {
+        form: {
+          resourceId: -1,
+        },
+        READ_ONLY_OPEN: 1,
+        OPEN: 2,
+        list: [],
+        keyword: '',
         dialog: {
           show: false,
         },
@@ -128,18 +136,33 @@
           name: '王小虎',
           address: '上海市普陀区金沙江路 1516 弄'
         }],
-        keyword: '',
-        list: [
-          {
-            "name": "MengTo/Spring",
-            "desc": "A library to simplify iOS animations in Swift.",
-            "goodNumber": 12,
-            "collectNumber": 1,
-            "updateTime": "2019-12-10"
-          },
-        ],
       };
     }, methods: {
+      getMyResourceList() {
+        request({
+          url: "resource/userResourceList",
+          method: "POST",
+          data: {
+            current: 1,
+            size: 10,
+            keyword: this.keyword
+          }
+        }).then(res => {
+          this.dialog.show = false;
+          console.log("resource/userResourceList:---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            this.list = res.data.records;
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("resource/userResourceList:|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
+      },
       openAndCanChangeConfirm() {
         MessageBox.confirm(
           '是否设置为开源可改?',
@@ -150,15 +173,33 @@
             type: 'warning'
           }
         ).then((res) => {
-          this.openAndCanChange();
+          this.open(this.form.resourceId, this.OPEN);
         })
 
 
-      }, openAndCanChange() {
-        Message({
-          message: '设置成功',
-          type: "success",
-          duration: 2000,
+      }, open(resourceId, type) {
+        request({
+          url: "resource/toPublicResource",
+          method: "POST",
+          data: {
+            resourceId: resourceId,
+            type: type,
+
+          }
+        }).then(res => {
+          this.dialog.show = false;
+          console.log(":---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            Message({message: "开源成功", type: "success", duration: 2000,})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log(":|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
         })
       },
       openAndReadOnlyConfirm() {
@@ -171,7 +212,9 @@
             type: 'warning'
           }
         ).then((res) => {
-          this.openAndReadOnly();
+          console.log(this.form.resourceId)
+          console.log(this.READ_ONLY_OPEN)
+          this.open(this.form.resourceId, this.READ_ONLY_OPEN);
         })
       }, openAndReadOnly() {
         Message({
@@ -194,7 +237,7 @@
         })
 
       },
-      audit(){
+      audit() {
 
       },
       uploadPic() {
@@ -233,6 +276,9 @@
       },
       showDialog(row) {
         this.dialog.show = true;
+        console.log("row")
+        console.log(row)
+        this.form.resourceId = row.id;
 
       },
       hello() {

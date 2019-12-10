@@ -7,7 +7,7 @@
         <el-col :xs="18" :sm="18" :lg="18" class="card-panel-col">
           <i class="el-icon-picture-outline" style="font-size:20px">
           <span style="color:blue;cursor:pointer;font-size:20px;" @click="showDialog(item)">
-          {{ item.name }}
+          {{ item.resourceName }}
           </span>
           </i>
         </el-col>
@@ -20,7 +20,7 @@
       </el-row>
       <el-row>
         <el-col :xs="24" :sm="24" :lg="24" class="card-panel-col" style="margin: 10px 0 0 0 ">
-          {{item.desc}}
+          {{item.describeContent}}
         </el-col>
       </el-row>
       <el-row style="margin:20px 0 0 0 ">
@@ -34,7 +34,6 @@
 
     </el-card>
 
-
     <el-dialog :visible.sync="dialog.show" title="资源详情">
       <el-row>
         <el-col :xs="18" :sm="18" :lg="18" class="card-panel-col">
@@ -43,7 +42,8 @@
           <el-button type="info" @click="cloneConfirm">克隆</el-button>
         </el-col>
         <el-col :xs="6" :sm="6" :lg="6" class="card-panel-col" style="text-align: right">
-          <i class="el-icon-star-off" style="font-size:20px;margin:0 20px 0 20px;cursor:pointer" @click="collect">收藏</i>
+          <i class="el-icon-star-off" style="font-size:20px;margin:0 20px 0 20px;cursor:pointer"
+             @click="confirmCollection">收藏</i>
           <i class="el-icon-s-flag" style="font-size:20px;cursor:pointer" @click="good">点赞</i>
 
         </el-col>
@@ -54,23 +54,39 @@
           :data="tableData"
           style="width: 100%">
           <el-table-column
-            prop="date"
+            prop="url"
+            label="图片">
+               <template slot-scope="scope">
+                 <el-popover
+                  placement="right"
+                  title=""
+                  trigger="hover">
+            <span slot="reference"> {{scope.row.url}}</span>
+
+                  <img  :src="'http://127.0.0.1:8080/resourceImg/img/'+scope.row.url"
+                       :alt="scope.row.picture" style="max-height: 350px;max-width: 350px">
+               </el-popover>
+                </template>
+          </el-table-column>
+          <el-table-column
+            prop="uploadTime"
             label="日期"
             width="180">
           </el-table-column>
-          <el-table-column
-            prop="name"
-            label="姓名"
-            width="180">
-          </el-table-column>
-          <el-table-column
-            prop="address"
-            label="地址">
-          </el-table-column>
         </el-table>
+
+        <pagination  v-show="listQueryByImgList.total>0" :total="listQueryByImgList.total"
+                    :page.sync="listQueryByImgList.current"
+                    :limit.sync="listQueryByImgList.limit" @pagination="requestImgList"/>
+
 
       </el-row>
     </el-dialog>
+
+    <el-popover placement="right" title="" trigger="hover">
+      <img :src="url" alt="hello"/>
+
+    </el-popover>
   </div>
 
 </template>
@@ -93,38 +109,29 @@
   }
 </style>
 <script>
-  import axios from "axios";
+  import Pagination from '@/views/Pagination'
   import {Message, MessageBox} from 'element-ui'
-  import Cookies from 'js-cookie'
+  import request from '@/utils/Axios'
 
   export default {
     name: "PublicResource",
-    components: {Message, MessageBox},
+    components: {Message, MessageBox,Pagination},
     created: function () {
+      this.selectData();
 
     },
     data: function () {
       return {
+        listQueryByImgList:{
+          current:1,
+          size:10,
+        },
+        url:'',
         dialog: {
           show: false,
+          resourceId: -1,
         },
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }],
+        tableData: [],
         keyword: '',
         list: [
           {
@@ -137,6 +144,37 @@
         ],
       };
     }, methods: {
+      cal(url){
+        console.log(url)
+        return require(url)
+      },
+      selectData() {
+        request({
+          url: "resource/resourceOpenList",
+          method: "POST",
+          data: {
+            current: 1,
+            size: 10,
+            keyword: this.keyword,
+
+          }
+        }).then(res => {
+          this.dialog.show = false;
+          console.log(":---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            this.list = res.data.records;
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log(":|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
+
+      },
       confirmCollection() {
         MessageBox.confirm(
           '是否收藏该资源?',
@@ -152,17 +190,47 @@
 
       },
       collect() {
-        Message({
-          message: '收藏成功',
-          type: "success",
-          duration: 2000,
-        })
+        request({
+          url: "resource/collect",
+          method: "POST",
+          data: {
+            resourceId: this.dialog.resourceId,
+          }
+        }).then(res => {
+          console.log("resource/collect:---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            Message({message: "收藏资源集成功", type: "success", duration: 2000,})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("resource/collect:|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        });
       }, good() {
-        Message({
-          message: '点赞成功',
-          type: "success",
-          duration: 2000,
-        })
+        request({
+          url: "resource/good",
+          method: "POST",
+          data: {
+            resourceId: this.dialog.resourceId,
+          }
+        }).then(res => {
+          console.log("resource/good:---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            Message({message: '点赞成功', type: "success", duration: 2000,})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("resource/good:|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        });
 
       },
       cloneConfirm() {
@@ -178,10 +246,54 @@
       },
       showDialog(row) {
         this.dialog.show = true;
+        this.dialog.resourceId = row.id;
+        this.requestImgList();
+
+      }, requestImgList() {
+        request({
+          url: "resourceImg/listImg",
+          method: "POST",
+          data: {
+            current: 1,
+            size: 10,
+            resourceId: this.dialog.resourceId,
+          }
+        }).then(res => {
+          // this.dialog.show = false;
+          console.log("resourceImg/listImg:---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            this.tableData = res.data.records;
+            this.listQueryByImgList.total = res.data.total
+            Message({
+                message: res.data.total,
+                type:"success",
+                duration: 2000,
+            })
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("resourceImg/listImg:|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
 
       },
       hello() {
+        Message({
+            message: 'hello',
+            type:"success",
+            duration: 2000,
+        })
 
+      },world(){
+        Message({
+            message: 'world',
+            type:"error",
+            duration: 2000,
+        })
       }
     }, watch: {
       "test": function () {

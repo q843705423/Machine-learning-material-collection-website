@@ -49,6 +49,9 @@
 
       };
     }, methods: {
+      handleClick(){
+
+      },
       hello() {
 
       }
