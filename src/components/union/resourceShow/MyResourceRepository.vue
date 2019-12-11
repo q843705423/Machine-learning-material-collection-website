@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-input v-model="keyword" placeholder="请输入关键字"/>
+    <el-input v-model="keyword" placeholder="请输入关键字" @keyup.enter.native="getMyResourceList"  />
+     
     <el-card v-for="item in list" class="box-card">
 
       <el-row>
@@ -34,6 +35,11 @@
       </el-row>
 
     </el-card>
+    <pagination v-show="resourceQuery.total>0"
+                :total="resourceQuery.total"
+                :page.sync="resourceQuery.current"
+                :limit.sync="resourceQuery.size"
+                @pagination="getMyResourceList"/>
 
 
     <el-dialog :visible.sync="dialog.show" title="资源详情">
@@ -56,20 +62,31 @@
           :data="tableData"
           style="width: 100%">
           <el-table-column
-            prop="date"
+            prop="url"
+            label="图片">
+            <template slot-scope="scope">
+              <el-popover
+                    placement="right"
+                    title=""
+                    trigger="hover">
+                <span slot="reference"> {{scope.row.url}}</span>
+                    <img :src="'http://127.0.0.1:8080/resourceImg/img/'+scope.row.url"
+                         :alt="scope.row.picture" style="max-height: 350px;max-width: 350px">
+              </el-popover>
+                
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="uploadTime"
             label="日期"
             width="180">
           </el-table-column>
-          <el-table-column
-            prop="name"
-            label="姓名"
-            width="180">
-          </el-table-column>
-          <el-table-column
-            prop="address"
-            label="地址">
-          </el-table-column>
         </el-table>
+        <pagination v-show="listQueryByImgList.total>0"
+                    :total="listQueryByImgList.total"
+                    :page.sync="listQueryByImgList.current"
+                    :limit.sync="listQueryByImgList.size"
+                    @pagination="requestImgList"/>
 
       </el-row>
     </el-dialog>
@@ -95,13 +112,14 @@
   }
 </style>
 <script>
+  import Pagination from '@/views/Pagination'
   import {Message, MessageBox} from 'element-ui'
   import request from '@/utils/Axios'
   import Cookies from 'js-cookie'
 
   export default {
     name: "MyResourceRepository",
-    components: {Message, MessageBox},
+    components: {Message, MessageBox, Pagination},
 
     created: function () {
       this.getMyResourceList()
@@ -109,6 +127,17 @@
     },
     data: function () {
       return {
+        listQueryByImgList: {
+          current: 1,
+          size: 10,
+          total: 0,
+
+        },
+        resourceQuery: {
+          current: 1,
+          size: 10,
+          total: 0,
+        },
         form: {
           resourceId: -1,
         },
@@ -119,23 +148,7 @@
         dialog: {
           show: false,
         },
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }],
+        tableData: [],
       };
     }, methods: {
       getMyResourceList() {
@@ -143,8 +156,8 @@
           url: "resource/userResourceList",
           method: "POST",
           data: {
-            current: 1,
-            size: 10,
+            current: this.resourceQuery.current,
+            size: this.resourceQuery.size,
             keyword: this.keyword
           }
         }).then(res => {
@@ -154,6 +167,7 @@
           console.log(res);
           if (res.code === 0) {
             this.list = res.data.records;
+            this.resourceQuery.total = res.data.total
           } else {
             Message({message: res.msg, type: "error", duration: 2000,})
           }
@@ -224,6 +238,34 @@
         })
 
       },
+
+      requestImgList() {
+        request({
+          url: "resourceImg/listImg",
+          method: "POST",
+          data: {
+            current: this.listQueryByImgList.current,
+            size: this.listQueryByImgList.size,
+            resourceId: this.form.resourceId,
+          }
+        }).then(res => {
+          console.log("resourceImg/listImg:---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            console.log("?????????????????????")
+            this.tableData = res.data.records;
+            this.listQueryByImgList.total = res.data.total
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("resourceImg/listImg:|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
+
+      },
       openConfirm() {
         MessageBox.confirm(
           '是否将该资源集合开源?',
@@ -266,11 +308,38 @@
 
       },
 
+      setClip(content) {
+        var oInput = document.createElement('input');
+        oInput.value = content;
+        document.body.appendChild(oInput);
+        oInput.select();
+        document.execCommand("Copy");
+        oInput.className = 'oInput';
+        oInput.style.display = 'none';
+      },
       getDownloadUrl() {
-        Message({
-          message: '已经将路径复制于剪切板',
-          type: "success",
-          duration: 2000,
+        request({
+          url: "resource/downloadUrl",
+          method: "POST",
+          data: {
+            resourceId: this.form.resourceId,
+          }
+        }).then(res => {
+          res = res.data;
+          console.log("---------------");
+          console.log(res);
+          if (res.code === 0) {
+            this.setClip(res.data);
+            Message({message: '已经将路径复制于剪切板', type: "success", duration: 2000})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+        }).catch(res => {
+          Message({
+            message: '发生未知错误',
+            type: "error",
+            duration: 2000,
+          })
         })
 
       },
@@ -279,6 +348,7 @@
         console.log("row")
         console.log(row)
         this.form.resourceId = row.id;
+        this.requestImgList();
 
       },
       hello() {

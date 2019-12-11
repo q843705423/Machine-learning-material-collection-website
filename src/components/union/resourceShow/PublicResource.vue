@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-input v-model="keyword" placeholder="请输入关键字"/>
+    <el-input v-model="keyword" placeholder="请输入关键字" @keyup.enter.native="selectData"  />
     <el-card v-for="item in list" class="box-card">
 
       <el-row>
@@ -33,12 +33,17 @@
       </el-row>
 
     </el-card>
+    <pagination v-show="listQueryResource.total>0"
+                :total="listQueryResource.total"
+                :page.sync="listQueryResource.current"
+                :limit.sync="listQueryResource.size"
+                @pagination="selectData"/>
 
     <el-dialog :visible.sync="dialog.show" title="资源详情">
       <el-row>
         <el-col :xs="18" :sm="18" :lg="18" class="card-panel-col">
           <el-button type="success" @click="getDownloadUrl">下载文件路径</el-button>
-          <el-button type="warning" @click="getDownloadUrl">请求上传图片</el-button>
+          <el-button type="warning" @click="getDownloadUrl" v-if="this.dialog.type === 2">请求上传图片</el-button>
           <el-button type="info" @click="cloneConfirm">克隆</el-button>
         </el-col>
         <el-col :xs="6" :sm="6" :lg="6" class="card-panel-col" style="text-align: right">
@@ -56,17 +61,21 @@
           <el-table-column
             prop="url"
             label="图片">
-               <template slot-scope="scope">
-                 <el-popover
-                  placement="right"
-                  title=""
-                  trigger="hover">
-            <span slot="reference"> {{scope.row.url}}</span>
+             
+            <template slot-scope="scope">
+                 
+              <el-popover
+                    placement="right"
+                    title=""
+                    trigger="hover">
+                <span slot="reference"> {{scope.row.url}}</span>
 
-                  <img  :src="'http://127.0.0.1:8080/resourceImg/img/'+scope.row.url"
-                       :alt="scope.row.picture" style="max-height: 350px;max-width: 350px">
-               </el-popover>
-                </template>
+                    <img :src="'http://127.0.0.1:8080/resourceImg/img/'+scope.row.url"
+                         :alt="scope.row.picture" style="max-height: 350px;max-width: 350px">
+                   
+              </el-popover>
+                
+            </template>
           </el-table-column>
           <el-table-column
             prop="uploadTime"
@@ -75,18 +84,22 @@
           </el-table-column>
         </el-table>
 
-        <pagination  v-show="listQueryByImgList.total>0" :total="listQueryByImgList.total"
+        <pagination v-show="listQueryByImgList.total>0" :total="listQueryByImgList.total"
                     :page.sync="listQueryByImgList.current"
-                    :limit.sync="listQueryByImgList.limit" @pagination="requestImgList"/>
+                    :limit.sync="listQueryByImgList.size" @pagination="requestImgList"/>
 
 
       </el-row>
     </el-dialog>
+    <el-dialog :visible.sync="cloneForm.show" title="克隆资源集">
+      <el-input v-model="cloneForm.resourceName" placeholder="请输入资源名"/>
 
-    <el-popover placement="right" title="" trigger="hover">
-      <img :src="url" alt="hello"/>
+      <el-button type="primary" @click="confirmCreateResource">确定</el-button>
+      <el-button type="primary" @click="closeCloneFormDialog">取消</el-button>
 
-    </el-popover>
+
+    </el-dialog>
+
   </div>
 
 </template>
@@ -115,46 +128,76 @@
 
   export default {
     name: "PublicResource",
-    components: {Message, MessageBox,Pagination},
+    components: {Message, MessageBox, Pagination},
     created: function () {
       this.selectData();
 
     },
     data: function () {
       return {
-        listQueryByImgList:{
-          current:1,
-          size:10,
+        cloneForm: {
+          show: false,
+          resourceName: '',
         },
-        url:'',
+        listQueryByImgList: {
+          current: 1,
+          size: 10,
+          total: 0,
+        },
+        url: '',
         dialog: {
           show: false,
           resourceId: -1,
+          type: 2,
+        },
+        listQueryResource: {
+          current: 1,
+          size: 10,
+          total: 0,
+
         },
         tableData: [],
         keyword: '',
-        list: [
-          {
-            "name": "MengTo/Spring",
-            "desc": "A library to simplify iOS animations in Swift.",
-            "goodNumber": 12,
-            "collectNumber": 1,
-            "updateTime": "2019-12-10"
-          },
-        ],
+        list: [],
       };
     }, methods: {
-      cal(url){
-        console.log(url)
-        return require(url)
+      closeCloneFormDialog() {
+        this.cloneForm.show = false;
+      },
+      confirmCreateResource() {
+
+        request({
+          url: "resource/clonePublicResource",
+          method: "POST",
+          data: {
+            resourceName: this.cloneForm.resourceName,
+            resourceId: this.dialog.resourceId,
+          }
+        }).then(res => {
+          this.cloneForm.show = false;
+          console.log("resource/clonePublicResource:---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            Message({message: "克隆数据成功", type: "success", duration: 2000,})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("resource/clonePublicResource:|||||||||||||||||||||||||||||||||||||||||||")
+          this.selectData();
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
+        })
+
       },
       selectData() {
         request({
           url: "resource/resourceOpenList",
           method: "POST",
           data: {
-            current: 1,
-            size: 10,
+            current: this.listQueryResource.current,
+            size: this.listQueryResource.size,
             keyword: this.keyword,
 
           }
@@ -165,6 +208,9 @@
           console.log(res);
           if (res.code === 0) {
             this.list = res.data.records;
+            console.log("this.listQueryByImgList.total");
+            console.log(this.listQueryByImgList.total);
+            this.listQueryResource.total = res.data.total
           } else {
             Message({message: res.msg, type: "error", duration: 2000,})
           }
@@ -234,43 +280,68 @@
 
       },
       cloneConfirm() {
-
-      },
-      getDownloadUrl() {
-        Message({
-          message: '已经将路径复制于剪切板',
-          type: "success",
-          duration: 2000,
-        })
+        this.cloneForm.show = true;
 
       },
       showDialog(row) {
         this.dialog.show = true;
         this.dialog.resourceId = row.id;
+        this.dialog.type = row.type;
         this.requestImgList();
 
-      }, requestImgList() {
+      },
+
+      getDownloadUrl() {
+        request({
+          url: "resource/downloadUrl",
+          method: "POST",
+          data: {
+            resourceId: this.dialog.resourceId,
+          }
+        }).then(res => {
+          res = res.data;
+          console.log("---------------");
+          console.log(res);
+          if (res.code === 0) {
+            this.setClip(res.data);
+            Message({message: '已经将路径复制于剪切板', type: "success", duration: 2000})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+        }).catch(res => {
+          Message({
+            message: '发生未知错误',
+            type: "error",
+            duration: 2000,
+          })
+        })
+
+      },
+      setClip(content) {
+        var oInput = document.createElement('input');
+        oInput.value = content;
+        document.body.appendChild(oInput);
+        oInput.select();
+        document.execCommand("Copy");
+        oInput.className = 'oInput';
+        oInput.style.display = 'none';
+      },
+      requestImgList() {
         request({
           url: "resourceImg/listImg",
           method: "POST",
           data: {
-            current: 1,
-            size: 10,
+            current: this.listQueryByImgList.current,
+            size: this.listQueryByImgList.size,
             resourceId: this.dialog.resourceId,
           }
         }).then(res => {
-          // this.dialog.show = false;
           console.log("resourceImg/listImg:---------------------");
           res = res.data;
           console.log(res);
           if (res.code === 0) {
             this.tableData = res.data.records;
             this.listQueryByImgList.total = res.data.total
-            Message({
-                message: res.data.total,
-                type:"success",
-                duration: 2000,
-            })
           } else {
             Message({message: res.msg, type: "error", duration: 2000,})
           }
@@ -283,16 +354,16 @@
       },
       hello() {
         Message({
-            message: 'hello',
-            type:"success",
-            duration: 2000,
+          message: 'hello',
+          type: "success",
+          duration: 2000,
         })
 
-      },world(){
+      }, world() {
         Message({
-            message: 'world',
-            type:"error",
-            duration: 2000,
+          message: 'world',
+          type: "error",
+          duration: 2000,
         })
       }
     }, watch: {
