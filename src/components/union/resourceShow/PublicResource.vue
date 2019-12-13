@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-input v-model="keyword" placeholder="请输入关键字" @keyup.enter.native="selectData"  />
+    <el-input v-model="keyword" placeholder="请输入关键字" @keyup.enter.native="selectData"/>
     <el-card v-for="item in list" class="box-card">
 
       <el-row>
@@ -45,6 +45,11 @@
           <el-button type="success" @click="getDownloadUrl">下载文件路径</el-button>
           <el-button type="warning" @click="getDownloadUrl" v-if="this.dialog.type === 2">请求上传图片</el-button>
           <el-button type="info" @click="cloneConfirm">克隆</el-button>
+
+          <span slot="footer" class="dialog-footer">
+        <el-button type="danger" @click="">确定</el-button>
+        <el-button type="primary" @click="">取消</el-button>
+      </span>
         </el-col>
         <el-col :xs="6" :sm="6" :lg="6" class="card-panel-col" style="text-align: right">
           <i class="el-icon-star-off" style="font-size:20px;margin:0 20px 0 20px;cursor:pointer"
@@ -94,8 +99,10 @@
     <el-dialog :visible.sync="cloneForm.show" title="克隆资源集">
       <el-input v-model="cloneForm.resourceName" placeholder="请输入资源名"/>
 
-      <el-button type="primary" @click="confirmCreateResource">确定</el-button>
-      <el-button type="primary" @click="closeCloneFormDialog">取消</el-button>
+      <span slot="footer" class="dialog-footer">
+      <el-button type="success" @click="confirmCreateResource">确定</el-button>
+      <el-button type="info" @click="closeCloneFormDialog">取消</el-button>
+        </span>
 
 
     </el-dialog>

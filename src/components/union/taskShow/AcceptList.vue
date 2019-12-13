@@ -287,6 +287,7 @@
             subTaskId:subTaskId
           }
         }).then(res => {
+          this.selectAcceptList();
           console.log(":---------------------");
           res = res.data;
           console.log(res);

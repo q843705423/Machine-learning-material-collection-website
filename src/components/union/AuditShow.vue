@@ -91,12 +91,14 @@
               </el-form-item>
 
               <el-form-item label="">
+<!--
                 <el-button type="success" @click="agreeConfirm">
                   同意
                 </el-button>
                 <el-button type="danger" @click="rejectConfirm">
                   拒绝
                 </el-button>
+-->
               </el-form-item>
 
 
@@ -289,7 +291,7 @@
 
       },
       audit(row) {
-        this.form = row
+        this.form = row;
         this.dialog.show = true;
 
 

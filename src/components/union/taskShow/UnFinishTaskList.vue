@@ -68,9 +68,6 @@
           <el-input v-model="form.resourceId" readonly/>
         </el-form-item>
 
-        <el-form-item label="审核用户id">
-          <el-input v-model="form.auditUserId" readonly/>
-        </el-form-item>
 
         <el-form-item label="拒绝原因">
           <el-input v-model="form.rejectCause" readonly/>
@@ -167,7 +164,7 @@
           <el-button type="primary" @click="detail(scope.row)">
             详情
           </el-button>
-          <el-button type="success" @click="finishTaskConfirm(scope.row.id)" v-if="scope.row.status !== 1">
+          <el-button type="success" @click="finishTaskConfirm(scope.row.id)" v-if="scope.row.status === 1">
             完成
           </el-button>
 
@@ -253,6 +250,7 @@
           } else {
             Message({message: res.msg, type: "error", duration: 2000,})
           }
+          this.selectData();
           console.log("task/finishPublishTask:|||||||||||||||||||||||||||||||||||||||||||")
         }).catch(res => {
           console.log("!!!!!!!!!!!!");

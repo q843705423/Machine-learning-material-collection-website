@@ -30,7 +30,7 @@
       <el-row style="font-size:20px;margin: 20px 0 0 20px">
         <el-col :xs="12" :sm="12" :lg="12" class="card-panel-col">
           <i class="el-icon-picture">
-            {{dialog.pictureNumber}}
+            {{dialog.pictureNumberEachTask}}
           </i>
         </el-col>
         <el-col :xs="12" :sm="12" :lg="12" class="card-panel-col">
@@ -196,7 +196,8 @@
         this.dialog.content = item.content;
         this.dialog.nickname = item.nickname;
         this.dialog.eachTaskScore = item.eachTaskScore;
-        this.dialog.pictureNumber = item.pictureNumber;
+        this.dialog.pictureNumberEachTask = item.pictureNumberEachTask ;
+        this.dialog.endTime = item.endTime ;
         this.dialog.lowerCreditLimit = item.lowerCreditLimit;
         this.dialog.taskNumber = item.taskNumber;
         this.showDialog = true;

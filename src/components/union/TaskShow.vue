@@ -31,14 +31,14 @@
               <el-form-item label="详细信息" prop="content">
                 <el-input type="textarea" :rows="8" placeholder="请详细描述图片的具体需求" v-model="form.content"></el-input>
               </el-form-item>
-              <el-form-item label="需求量" prop="pictureNumber">
-                <el-input type="number" placeholder="请输入所需要的图片张数" v-model="form.pictureNumber"></el-input>
-              </el-form-item>
               <el-form-item label="划分子任务" prop="taskNumber">
                 <el-input type="number" placeholder="划分成多少个子任务个数" v-model="form.taskNumber"></el-input>
               </el-form-item>
+              <el-form-item label="子需求量" prop="pictureNumberEachTask">
+                <el-input type="number" placeholder="每个子任务图片数" v-model="form.pictureNumberEachTask"></el-input>
+              </el-form-item>
               <el-form-item label="最低信用限制" prop="lowerCreditLimit">
-                <el-input type="number" placeholder="划分成多少个子任务个数" v-model="form.lowerCreditLimit"></el-input>
+                <el-input type="number" placeholder="接受任务的用户信用度" v-model="form.lowerCreditLimit"></el-input>
               </el-form-item>
               <el-form-item label="每份积分" prop="eachTaskScore">
                 <el-input type="number" placeholder="" v-model="form.eachTaskScore"></el-input>
@@ -105,7 +105,7 @@
         form: {
           title: "",
           content: "",
-          pictureNumber: "",
+          pictureNumberEachTask: "",
           taskNumber: "",
           eachTaskScore: "",
           beginTime: "",

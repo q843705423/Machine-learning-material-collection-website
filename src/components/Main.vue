@@ -16,7 +16,7 @@
 
     <div class="body">
       <div class="header">
-        <a href="notice">
+        <a  @click="hintError">
           <div style="line-height: 40px;padding:0 0 0 20px;color:#007bfc;font-weight: bold;float:left">
             最新公告:
           </div>
@@ -190,7 +190,16 @@
 
         }],
       }
-    }, filters: {
+    },methods:{
+      hintError(){
+        Message({
+            message: '该活动暂时已经结束',
+            type:"error",
+            duration: 2000,
+        })
+      }
+    },
+    filters: {
       rateFilter(row) {
         return row.now;
       }

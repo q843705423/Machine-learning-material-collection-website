@@ -13,13 +13,13 @@
         <el-input v-model="form.nickname" readonly/>
       </el-form-item>
 
-
-      <el-form-item label="手机号">
-        <el-input v-model="form.telephone" readonly/>
+      <el-form-item label="信用度">
+        <el-input v-model="form.creditValue" readonly/>
       </el-form-item>
 
 
-      <el-form-item label="开支">
+
+      <el-form-item label="余额">
         <el-input v-model="form.budget" readonly/>
       </el-form-item>
 
@@ -28,10 +28,10 @@
         <el-input v-model="form.email" readonly/>
       </el-form-item>
 
-
-      <el-form-item label="信用度">
-        <el-input v-model="form.creditValue" readonly/>
+      <el-form-item label="手机号">
+        <el-input v-model="form.telephone" readonly/>
       </el-form-item>
+
 
       <el-button type="primary" @click="updateUserConfirm">更新信息</el-button>
 
@@ -49,8 +49,8 @@
         </el-form>
 
         <span slot="footer" class="dialog-footer">
-          <el-button type="danger" @click="update">确定</el-button>
-          <el-button type="primary" @click="">取消</el-button>
+          <el-button type="success" @click="update">确定</el-button>
+          <el-button type="info" @click="dialog.show = false">取消</el-button>
         </span>
       </el-dialog>
 
@@ -102,6 +102,7 @@
           }
         }).then(res => {
           this.dialog.show = false;
+          this.selectUserInfo();
           console.log("user/updateInfo:---------------------");
           res = res.data;
           console.log(res);
@@ -123,7 +124,7 @@
       },
       selectUserInfo() {
         request({
-          url: "user/info",
+          url: "user/newInfo",
           method: "POST",
           data: {}
         }).then(res => {
