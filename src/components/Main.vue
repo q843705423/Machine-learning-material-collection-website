@@ -25,7 +25,9 @@
           </div>
           <div style="float:right;line-height: 40px; margin:0 40px 0 0">
             <el-link style="">
-              <i class="el-icon-user-solid"> </i>
+              <i class="el-icon-user-solid">
+                 {{ userInfo.username }}
+              </i>
             </el-link>
             <el-link style="">
               <i class="el-icon-s-comment" style="font-size:15px"> </i>
@@ -115,6 +117,7 @@
     name: "Main",
     components: {},
     created:function(){
+      this.selectUser();
       request({
         url:"menu/list",
         method:"POST",
@@ -149,6 +152,9 @@
     },
     data: function () {
       return {
+        userInfo:{
+          username:'',
+        },
         menuList:[1,2,3],
         url: "../assets/icon/bill_icon.png",
         tableData: [{
@@ -196,6 +202,26 @@
             message: '该活动暂时已经结束',
             type:"error",
             duration: 2000,
+        })
+      },selectUser(){
+        request({
+          url: "user/newInfo",
+          method: "POST",
+          data: {}
+        }).then(res => {
+          console.log("user/newInfo:---------------------");
+          res = res.data;
+          console.log(res);
+          if (res.code === 0) {
+            this.userInfo = res.data;
+            Message({message: res.msg, type: "success", duration: 2000,})
+          } else {
+            Message({message: res.msg, type: "error", duration: 2000,})
+          }
+          console.log("user/newInfo:|||||||||||||||||||||||||||||||||||||||||||")
+        }).catch(res => {
+          console.log("!!!!!!!!!!!!");
+          console.log(res);
         })
       }
     },
