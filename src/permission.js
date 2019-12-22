@@ -13,6 +13,14 @@ var myRouter = null;
 router.beforeEach((to, from, next) => {
 
   document.title = '赋能平台';
+  console.log("to--------------------");
+  if(to.path === "/logout"){
+    myRouter = null
+    localStorage.clear()
+    next("/login");
+    return;
+
+  }
   let needRefreshRouter = localStorage.getItem('needRefreshRouter');
   if (needRefreshRouter === '1') {
     myRouter = null

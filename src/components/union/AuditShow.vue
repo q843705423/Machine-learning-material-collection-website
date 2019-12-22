@@ -33,25 +33,14 @@
 
             <el-form ref="dataForm" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
 
-              <el-form-item label="id">
-                <el-input v-model="form.id" readonly/>
-              </el-form-item>
-
               <el-form-item label="标题">
                 <el-input v-model="form.title" readonly/>
               </el-form-item>
 
               <el-form-item label="内容">
-                <el-input v-model="form.content" readonly/>
+                <el-input v-model="form.content" readonly type="textarea" :rows="10"/>
               </el-form-item>
 
-              <el-form-item label="类型">
-                <el-input v-model="form.type" readonly/>
-              </el-form-item>
-
-              <el-form-item label="状态">
-                <el-input v-model="form.status" readonly/>
-              </el-form-item>
 
               <el-form-item label="开始时间">
                 <el-input v-model="form.beginTime" readonly/>
@@ -65,8 +54,8 @@
                 <el-input v-model="form.createTime" readonly/>
               </el-form-item>
 
-              <el-form-item label="图片总数">
-                <el-input v-model="form.pictureNumber" readonly/>
+              <el-form-item label="单任务图片数">
+                <el-input v-model="form.pictureNumberEachTask" readonly/>
               </el-form-item>
 
               <el-form-item label="每个子任务得分">
@@ -77,38 +66,12 @@
                 <el-input v-model="form.taskNumber" readonly/>
               </el-form-item>
 
-              <el-form-item label="用户">
-                <el-input v-model="form.userId" readonly/>
-              </el-form-item>
-
 
               <el-form-item label="限制最低积分">
                 <el-input v-model="form.lowerCreditLimit" readonly/>
               </el-form-item>
 
-              <el-form-item label="任务接受量">
-                <el-input v-model="form.taskAcceptNumber" readonly/>
-              </el-form-item>
-
-              <el-form-item label="">
-<!--
-                <el-button type="success" @click="agreeConfirm">
-                  同意
-                </el-button>
-                <el-button type="danger" @click="rejectConfirm">
-                  拒绝
-                </el-button>
--->
-              </el-form-item>
-
-
             </el-form>
-
-          </el-col>
-          <el-col>
-
-          </el-col>
-          <el-col>
 
           </el-col>
         </el-row>
@@ -180,10 +143,10 @@
     components: {Pagination},
     data: function () {
       return {
-        updateDialog:{
-          show:false,
-          rejectCause:'',
-          taskId:'',
+        updateDialog: {
+          show: false,
+          rejectCause: '',
+          taskId: '',
         },
         form: {
           id: "",
@@ -219,7 +182,7 @@
       };
     }, methods: {
       agreeConfirm(row) {
-        if(row){
+        if (row) {
           this.form.id = row.id;
         }
 
@@ -261,7 +224,7 @@
 
       },
       rejectConfirm(row) {
-        if(row){
+        if (row) {
           this.form.id = row.id;
         }
         this.updateDialog.show = true;
@@ -270,8 +233,8 @@
           url: "task/reject",
           method: "POST",
           data: {
-            taskId:this.form.id,
-            rejectCause:this.updateDialog.rejectCause
+            taskId: this.form.id,
+            rejectCause: this.updateDialog.rejectCause
           }
         }).then(res => {
           this.updateDialog.show = false

@@ -51,8 +51,8 @@
 
         </el-col>
         <el-col :xs="6" :sm="6" :lg="6" class="card-panel-col" style="text-align: right">
-          <i class="el-icon-info" @click="openAndReadOnlyConfirm" style="margin: 0 0 0 20px;cursor:pointer">开源只读</i>
-          <i class="el-icon-info" @click="openAndCanChangeConfirm" style="margin: 0 20px 0 20px;cursor:pointer">开源可改</i>
+          <i class="el-icon-info" @click="openAndReadOnlyConfirm" style="margin: 0 0 0 10px;cursor:pointer">开源只读</i>
+          <i class="el-icon-info" @click="openAndCanChangeConfirm" style="margin: 0 10px 0 10px;cursor:pointer">开源可改</i>
           <!--          <el-button type="success" @click="openConfirm">开源且可修改</el-button>-->
         </el-col>
 

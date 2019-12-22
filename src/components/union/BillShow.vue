@@ -30,7 +30,7 @@
             <template slot-scope="scope">
               <!--              {{ scope.row.type}}-->
               <el-tag :type="scope.row.type | typeShowFilter">
-                {{ scope.row.status | typeFilter}}
+                {{ scope.row.type | typeFilter}}
               </el-tag>
             </template>
           </el-table-column>

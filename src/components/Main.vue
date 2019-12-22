@@ -16,22 +16,33 @@
 
     <div class="body">
       <div class="header">
-        <a  @click="hintError">
+        <a >
           <div style="line-height: 40px;padding:0 0 0 20px;color:#007bfc;font-weight: bold;float:left">
             最新公告:
           </div>
           <div style="float:left;line-height:40px;font-size:12px;font-color:#303133;">
-            邀请注册，领取大礼
+            <a @click="hintError" style="cursor:pointer">
+              邀请注册，领取大礼
+            </a>
           </div>
           <div style="float:right;line-height: 40px; margin:0 40px 0 0">
-            <el-link style="">
-              <i class="el-icon-user-solid">
-                 {{ userInfo.username }}
-              </i>
-            </el-link>
-            <el-link style="">
-              <i class="el-icon-s-comment" style="font-size:15px"> </i>
-            </el-link>
+            <el-dropdown>
+              <span class="el-dropdown-link">
+                <el-link style="">
+                  <i class="el-icon-user-solid">
+                   {{ userInfo.username }}
+                  </i>
+                </el-link>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item style="margin:2px" >
+                  <div @click="logout">
+                    <i class="el-icon-s-promotion" >登出</i>
+
+                  </div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </div>
         </a>
       </div>
@@ -78,6 +89,7 @@
   img:hover {
     transform: translate(0px, -10px);;
   }
+
   svg {
     cursor: pointer;
     width: 64px;
@@ -111,51 +123,45 @@
 </style>
 <script>
   import request from '@/utils/Axios'
+  import {Message} from "element-ui";
   // import TaskShow from '@/components/union/TaskShow'
 
   export default {
     name: "Main",
     components: {},
-    created:function(){
+    created: function () {
       this.selectUser();
       request({
-        url:"menu/list",
-        method:"POST",
-      }).then(res=>{
+        url: "menu/list",
+        method: "POST",
+      }).then(res => {
         res = res.data;
-        if(res.code === 0){
+        if (res.code === 0) {
           this.menuList = res.data;
-          for(let i = 0 ;  i <= this.menuList.length ; i++){
+          for (let i = 0; i <= this.menuList.length; i++) {
 
-            this.menuList[i].img =  this.menuList[i].icon
+            this.menuList[i].img = this.menuList[i].icon
           }
-        }else{
+        } else {
           Message({
-              message: '发生未知错误',
-              type:"error",
-              duration: 2000,
+            message: '发生未知错误',
+            type: "error",
+            duration: 2000,
           })
         }
 
-      }).catch(res=>{
+      }).catch(res => {
 
       });
 
-/*
-      request({
-        url:"/menu/list",
-        method:"POST",
-      }).then(res=>{
-      })
-*/
 
     },
     data: function () {
       return {
-        userInfo:{
-          username:'',
+        userInfo: {
+          username: '',
         },
-        menuList:[1,2,3],
+        menuList: [1, 2, 3],
         url: "../assets/icon/bill_icon.png",
         tableData: [{
           date: '2016-05-02 15:36',
@@ -196,14 +202,18 @@
 
         }],
       }
-    },methods:{
-      hintError(){
+    }, methods: {
+      logout(){
+
+        this.$router.push({path:'/logout'})
+      },
+      hintError() {
         Message({
-            message: '该活动暂时已经结束',
-            type:"error",
-            duration: 2000,
+          message: '该活动暂时已经结束',
+          type: "error",
+          duration: 2000,
         })
-      },selectUser(){
+      }, selectUser() {
         request({
           url: "user/newInfo",
           method: "POST",
@@ -214,7 +224,7 @@
           console.log(res);
           if (res.code === 0) {
             this.userInfo = res.data;
-            Message({message: res.msg, type: "success", duration: 2000,})
+            // Message({message: res.msg, type: "success", duration: 2000,})
           } else {
             Message({message: res.msg, type: "error", duration: 2000,})
           }

@@ -13,7 +13,7 @@
             :auto-upload="false">
             <el-button size="small" type="primary">选择图片</el-button>
           </el-upload>
-          <el-button size="small" style="margin-left: 10px;"  type="success" @click="submitUpload">
+          <el-button size="small" style="margin-left: 10px;" type="success" @click="submitUpload">
             上传到服务器
           </el-button>
 
@@ -31,29 +31,11 @@
           <el-input v-model="viewDetailForm.nickname" readonly/>
         </el-form-item>
 
-        <el-form-item label="资源ID">
-          <el-input v-model="viewDetailForm.resourceId" readonly/>
-        </el-form-item>
 
         <el-form-item label="接受时间">
           <el-input v-model="viewDetailForm.acceptTime" readonly/>
         </el-form-item>
 
-        <el-form-item label="用户ID">
-          <el-input v-model="viewDetailForm.userId" readonly/>
-        </el-form-item>
-
-        <el-form-item label="任务ID">
-          <el-input v-model="viewDetailForm.taskId" readonly/>
-        </el-form-item>
-
-        <el-form-item label="完成数量">
-          <el-input v-model="viewDetailForm.finishNumber" readonly/>
-        </el-form-item>
-
-        <el-form-item label="子任务状态">
-          <el-input v-model="viewDetailForm.subStatus" readonly/>
-        </el-form-item>
 
         <el-form-item label="开始时间">
           <el-input v-model="viewDetailForm.beginTime" readonly/>
@@ -68,23 +50,26 @@
         </el-form-item>
 
         <el-form-item label="内容">
-          <el-input v-model="viewDetailForm.content" readonly/>
+
+          <el-input v-model="viewDetailForm.content" readonly type="textarea" :rows="10"/>
+          <!--<el-input v-model="viewDetailForm.content" readonly/>-->
         </el-form-item>
 
-        <el-form-item label="任务类型">
-          <el-input v-model="viewDetailForm.type" readonly/>
-        </el-form-item>
 
         <el-form-item label="创建时间">
           <el-input v-model="viewDetailForm.createTime" readonly/>
         </el-form-item>
 
-        <el-form-item label="图片数量">
-          <el-input v-model="viewDetailForm.pictureNumber" readonly/>
+        <el-form-item label="任务所需图片数">
+          <el-input v-model="viewDetailForm.pictureNumberEachTask" readonly/>
         </el-form-item>
 
         <el-form-item label="任务奖励">
           <el-input v-model="viewDetailForm.eachTaskScore" readonly/>
+        </el-form-item>
+
+        <el-form-item label="完成数量">
+          <el-input v-model="viewDetailForm.finishNumber" readonly/>
         </el-form-item>
 
         <el-form-item label="任务数量">
@@ -157,10 +142,19 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="400px">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="viewDetail(scope.row)">详情</el-button>
-          <el-button size="mini" type="warning" @click="continueFinish(scope.row)">继续完成</el-button>
-          <el-button size="mini" type="success" @click="finishTaskConfirm(scope.row)">完成任务</el-button>
-          <el-button size="mini" type="danger" @click="abandonMission(scope.row)">放弃任务</el-button>
+          <el-button size="mini" type="primary" @click="viewDetail(scope.row)" >
+            详情
+          </el-button>
+          <el-button size="mini" type="warning" @click="continueFinish(scope.row)" v-show="scope.row.subStatus===0">
+            继续完成
+          </el-button>
+          <el-button size="mini" type="success" @click="finishTaskConfirm(scope.row)" v-show="scope.row.subStatus===0">
+            完成任务
+          </el-button>
+
+          <el-button size="mini" type="danger" @click="abandonMission(scope.row)" v-show="scope.row.subStatus===0">
+            放弃任务
+          </el-button>
 
         </template>
       </el-table-column>
@@ -251,9 +245,9 @@
         }).then(res => {
           this.continueFinishDialog.show = false;
           res = res.data;
-          if(res.code === 0){
-            Message({message: "上传图片成功", type:"success", duration: 2000})
-          }else{
+          if (res.code === 0) {
+            Message({message: "上传图片成功", type: "success", duration: 2000})
+          } else {
             Message({message: res.msg, type: "error", duration: 2000});
           }
           this.selectAcceptList();
@@ -279,12 +273,12 @@
           this.finishsubTask(row.id)
         })
 
-      },finishsubTask(subTaskId){
+      }, finishsubTask(subTaskId) {
         request({
           url: "subTask/userFinishTask",
           method: "POST",
           data: {
-            subTaskId:subTaskId
+            subTaskId: subTaskId
           }
         }).then(res => {
           this.selectAcceptList();
@@ -359,7 +353,9 @@
       }, subStatusToTagTypeFilter(subStatus) {
         return subStatus === 0 ? 'info' : 'success';
       }, taskTypeFilter(type) {
-        return type === 0 ? "收集任务" : "分类任务"
+        return type;
+        // return type === 0 ? "收集任务" : "分类任务"
+        return "收集任务"
       }
     }
   }

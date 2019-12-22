@@ -18,9 +18,8 @@
       </el-form-item>
 
 
-
       <el-form-item label="余额">
-        <el-input v-model="form.budget" readonly/>
+        <el-input v-model="form.score" readonly/>
       </el-form-item>
 
 
@@ -39,11 +38,11 @@
         <el-form ref="dataForm" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
 
           <el-form-item label="电话">
-            <el-input v-model="dataForm.telephone"/>
+            <el-input v-model="dataForm.telephone" placeholder="暂无" />
           </el-form-item>
 
           <el-form-item label="电子邮件">
-            <el-input v-model="dataForm.email"/>
+            <el-input v-model="dataForm.email" placeholder="请输入关键字"/>
           </el-form-item>
 
         </el-form>
@@ -101,13 +100,12 @@
 
           }
         }).then(res => {
-          this.dialog.show = false;
-          this.selectUserInfo();
-          console.log("user/updateInfo:---------------------");
+          // this.dialog.show = false;
           res = res.data;
-          console.log(res);
           if (res.code === 0) {
-            Message({message: res.msg, type: "success", duration: 2000,})
+            this.form = res.data
+            this.selectUserInfo();
+            Message({message: "更新个人信息成功", type: "success", duration: 2000,})
           } else {
             Message({message: res.msg, type: "error", duration: 2000,})
           }
@@ -128,12 +126,14 @@
           method: "POST",
           data: {}
         }).then(res => {
-          this.showDialog = false;
+          this.dialog.show = false;
           console.log("user/info:---------------------");
           res = res.data;
           console.log(res);
           if (res.code === 0) {
             this.form = res.data;
+            // this.form.email = res.data.email == null ? '暂无' : res.data.email
+            // this.form.telephone = res.data.telephone? '暂无' : res.data.telephone
 
           } else {
             Message({message: res.msg, type: "error", duration: 2000,})

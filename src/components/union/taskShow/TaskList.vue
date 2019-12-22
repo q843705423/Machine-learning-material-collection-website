@@ -116,8 +116,9 @@
   import Pagination from '@/views/Pagination'
   import {Message, MessageBox} from 'element-ui'
   import request from '@/utils/Axios'
+
   export default {
-    name:"TaskList",
+    name: "TaskList",
     components: {Pagination},
     created: function () {
       this.selectData();
@@ -157,7 +158,7 @@
           url: "task/accept",
           method: "POST",
           data: {
-            taskId:taskId,
+            taskId: taskId,
           }
         }).then(res => {
           this.showDialog = false;
@@ -196,8 +197,8 @@
         this.dialog.content = item.content;
         this.dialog.nickname = item.nickname;
         this.dialog.eachTaskScore = item.eachTaskScore;
-        this.dialog.pictureNumberEachTask = item.pictureNumberEachTask ;
-        this.dialog.endTime = item.endTime ;
+        this.dialog.pictureNumberEachTask = item.pictureNumberEachTask;
+        this.dialog.endTime = item.endTime;
         this.dialog.lowerCreditLimit = item.lowerCreditLimit;
         this.dialog.taskNumber = item.taskNumber;
         this.showDialog = true;

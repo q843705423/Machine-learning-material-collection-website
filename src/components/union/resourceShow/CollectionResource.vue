@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-input v-model="keyword" placeholder="请输入关键字"/>
+<el-input v-model="keyword" placeholder="请输入关键字"/>
     <el-card v-for="item in list" class="box-card">
 
       <el-row>

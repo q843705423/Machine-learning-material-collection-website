@@ -13,16 +13,9 @@
         </el-form-item>
 
         <el-form-item label="内容">
-          <el-input v-model="form.content" readonly/>
+          <el-input v-model="form.content" readonly type="textarea" :rows="10"/>
         </el-form-item>
 
-        <el-form-item label="类型">
-          <el-input v-model="form.type" readonly/>
-        </el-form-item>
-
-        <el-form-item label="状态">
-          <el-input v-model="form.status" readonly/>
-        </el-form-item>
 
         <el-form-item label="开始时间">
           <el-input v-model="form.beginTime" readonly/>
@@ -36,7 +29,7 @@
           <el-input v-model="form.createTime" readonly/>
         </el-form-item>
 
-        <el-form-item label="每个任务的图片编号">
+        <el-form-item label="任务图片数">
           <el-input v-model="form.pictureNumberEachTask" readonly/>
         </el-form-item>
 
@@ -48,9 +41,6 @@
           <el-input v-model="form.taskNumber" readonly/>
         </el-form-item>
 
-        <el-form-item label="用户id">
-          <el-input v-model="form.userId" readonly/>
-        </el-form-item>
 
         <el-form-item label="任务完成数">
           <el-input v-model="form.taskFinishNumber" readonly/>
@@ -62,10 +52,6 @@
 
         <el-form-item label="任务接受量">
           <el-input v-model="form.taskAcceptNumber" readonly/>
-        </el-form-item>
-
-        <el-form-item label="资源id">
-          <el-input v-model="form.resourceId" readonly/>
         </el-form-item>
 
 
@@ -153,7 +139,7 @@
       </el-table-column>
 
 
-      <el-table-column align="center" label="resourceName">
+      <el-table-column align="center" label="资源名称">
         <template slot-scope="scope">
           {{ scope.row.resourceName}}
         </template>
@@ -221,7 +207,7 @@
 
       };
     }, methods: {
-      finishTaskConfirm (taskId){
+      finishTaskConfirm(taskId) {
         MessageBox.confirm(
           '是否完成此任务?',
           '确定完成此任务',
@@ -240,10 +226,9 @@
           url: "task/finishPublishTask",
           method: "POST",
           data: {
-            taskId:taskId
+            taskId: taskId
           }
         }).then(res => {
-          console.log("task/finishPublishTask:---------------------");
           res = res.data;
           if (res.code === 0) {
             Message({message: "完成该发布任务", type: "success", duration: 2000,})
@@ -251,10 +236,8 @@
             Message({message: res.msg, type: "error", duration: 2000,})
           }
           this.selectData();
-          console.log("task/finishPublishTask:|||||||||||||||||||||||||||||||||||||||||||")
         }).catch(res => {
-          console.log("!!!!!!!!!!!!");
-          console.log(res);
+          console.log(res)
         })
       },
       detail(row) {
@@ -290,29 +273,29 @@
       "test": function () {
 
       }
-    },filters:{
-      statusFilter(status){
+    }, filters: {
+      statusFilter(status) {
         let statusMap = {
-          0:"待审核",
-          1:"正在进行",
-          2:"已经完成",
-          3:"审核拒绝",
-          4:"已放弃",
+          0: "待审核",
+          1: "正在进行",
+          2: "已经完成",
+          3: "审核拒绝",
+          4: "已放弃",
         };
         return statusMap[status]
-      },typeFilter(type){
-        let typeMap ={
-          0:"普通收集任务"
+      }, typeFilter(type) {
+        let typeMap = {
+          0: "普通收集任务"
         }
         return typeMap[type]
 
-      },statusShowFilter(status){
+      }, statusShowFilter(status) {
         let statusShowMap = {
-          0:"info",
-          1:"warning",
-          2:"success",
-          3:"danger",
-          4:"danger",
+          0: "info",
+          1: "warning",
+          2: "success",
+          3: "danger",
+          4: "danger",
         };
         return statusShowMap[status]
       }
